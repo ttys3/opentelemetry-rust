@@ -2,7 +2,6 @@ use core::fmt;
 use once_cell::sync::OnceCell;
 use opentelemetry::metrics::{MetricsError, Result};
 use opentelemetry_sdk::metrics::{
-    reader::{AggregationSelector, MetricProducer},
     ManualReaderBuilder,
 };
 use std::sync::{Arc, Mutex};
@@ -105,16 +104,6 @@ impl ExporterBuilder {
         self
     }
 
-    /// Configure the [AggregationSelector] the exporter will use.
-    ///
-    /// If no selector is provided, the [DefaultAggregationSelector] is used.
-    ///
-    /// [DefaultAggregationSelector]: opentelemetry_sdk::metrics::reader::DefaultAggregationSelector
-    pub fn with_aggregation_selector(mut self, agg: impl AggregationSelector + 'static) -> Self {
-        self.reader = self.reader.with_aggregation_selector(agg);
-        self
-    }
-
     /// Configures whether to export resource as attributes with every metric.
     ///
     /// Note that this is orthogonal to the `target_info` metric, which can be disabled using `without_target_info`.
@@ -125,15 +114,6 @@ impl ExporterBuilder {
         resource_selector: impl Into<ResourceSelector>,
     ) -> Self {
         self.resource_selector = resource_selector.into();
-        self
-    }
-
-    /// Registers an external [MetricProducer] with this reader.
-    ///
-    /// The producer is used as a source of aggregated metric data which is
-    /// incorporated into metrics collected from the SDK.
-    pub fn with_producer(mut self, producer: impl MetricProducer + 'static) -> Self {
-        self.reader = self.reader.with_producer(producer);
         self
     }
 
